@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	margin: 0;
+	width: fit-content;
+}
+
+.containerBox {
+	min-height: 100vh;
+}
+
+@font-face {
+	font-family: "Caviar";
+	src: url("./assets/fonts/CaviarDreams/Regular.ttf");
+}
+
+@font-face {
+	font-family: "Josefin";
+	src: url("./assets/fonts/JosefinSans/Regular.ttf");
+}
+
+@font-face {
+	font-family: "Sourcesans";
+	src: url("./assets/fonts/SourceSans/Regular.otf");
+}
+
+@font-face {
+	font-family: "Antipasto";
+	src: url("./assets/fonts/Antipasto.ttf");
+}
+
+@font-face {
+	font-family: "Calypsoka";
+	src: url("./assets/fonts/Calypsoka.ttf");
+}
+
+@font-face {
+	font-family: "Roboto";
+	src: url("./assets/fonts/Roboto/Roboto-Regular.ttf");
+}
+
+@layer utilities {
+	.light .scrollbar::-webkit-scrollbar {
+		width: 0.8em;
+	}
+	.light .scrollbar::-webkit-scrollbar-track {
+		box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+		-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+		background-color: #404040;
+	}
+	.light .scrollbar::-webkit-scrollbar-thumb {
+		border-radius: 10px;
+		-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+		background-color: #d1d5db;
+		border-left: 2px solid #404040;
+	}
+	.light .scrollbar::-webkit-scrollbar-thumb:hover {
+		background: #cbd5e1;
+	}
+
+	.dark .scrollbar::-webkit-scrollbar {
+		width: 0.8em;
+	}
+	.dark .scrollbar::-webkit-scrollbar-track {
+		box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+		-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+		background-color: #525252;
+	}
+	.dark .scrollbar::-webkit-scrollbar-thumb {
+		border-radius: 10px;
+		-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+		background-color: #171717;
+		border-left: 3px solid #525252;
+	}
+	.dark .scrollbar::-webkit-scrollbar-thumb:hover {
+		background: #0a0a0a;
+	}
+}
