@@ -25,26 +25,16 @@ const Home = () => {
                 bitrateMin: 0,
                 bitrateMax: "",
                 hidebroken: true,
-                name: "japan"
             }
-        }).then(res => {
-            const station_data = res.data;
-            var new_data = [];
-            station_data.map(item => {
-                if (item.geo_lat !== null || item.geo_long !== null) {
-                    new_data.push({
-                        long: item.geo_long,
-                        lat: item.geo_lat,
-                        stationuuid: item.stationuuid,
-                        url: item.url,
-                        name: item.name
-                    })
-                }
+        })
+            .then(res => {
+                const station_data = res.data.filter(item => item.geo_lat !== null && item.geo_long !== null)
+                setStations(station_data);
             })
-            console.log('Search', new_data);
-            setStations(new_data);
-        });
-    }, [])
+            .catch(error => {
+                console.error("Error fetching station data:", error);
+            });
+    }, []);
 
     useEffect(() => {
         if (stations.length > 0) {
@@ -66,6 +56,14 @@ const Home = () => {
             panY: "rotateY",
             projection: am5map.geoOrthographic()
         }));
+        chart.events.on("pointerover", function (ev) {
+            var closest = stations.reduce(function (prev, curr) {
+                return ((Math.abs(curr.geo_lat - ev.target._geoCentroid.latitude) < Math.abs(prev.geo_lat - ev.target._geoCentroid.latitude)) && (Math.abs(curr.geo_long - ev.target._geoCentroid.longitude) < Math.abs(prev.geo_long - ev.target._geoCentroid.longitude)) ? curr : prev);
+            });
+
+            // let val = stations.filter(item => item.geo_lat === ev.target._geoCentroid.latitude && item.geo_long === ev.target._geoCentroid.longitude)
+            console.log('t', closest)
+        });
 
         // Series for background fill
         let backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
@@ -100,17 +98,9 @@ const Home = () => {
 
         // Create point series
         var pointSeries = chart.series.push(am5map.MapPointSeries.new(root, {
-            latitudeField: "lat",
-            longitudeField: "long"
+            latitudeField: "geo_lat",
+            longitudeField: "geo_long"
         }));
-
-        // Add event listeners to track latitude and longitude
-        chart.events.on('panning', (event) => {
-            console.log('event', event);
-            const zoomGeoPoint = chart.zoomGeoPoint;
-            setLatitude(zoomGeoPoint.latitude.toFixed(2));
-            setLongitude(zoomGeoPoint.longitude.toFixed(2));
-        });
 
         pointSeries.bullets.push(function () {
             var circle = am5.Circle.new(root, {
@@ -119,9 +109,11 @@ const Home = () => {
                 tooltipText: "{name}"
             });
 
-            circle.events.on("click", function (ev) {
-                console.log(ev.target.dataItem.dataContext)
-            });
+            circle.interactionsEnabled = true;
+
+            // circle.events.on("click", function (ev) {
+            //     console.log(ev.target.dataItem.dataContext)
+            // });
 
             return am5.Bullet.new(root, {
                 sprite: circle
