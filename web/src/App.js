@@ -56,7 +56,7 @@ const Layout = (props) => {
       <div className="containerBox flex flex-col bg-slate-200 dark:bg-neutral-800">
         {/* <Snackbar data={common.snack} setMessage={setSnackMessage} /> */}
         <Outlet />
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </main>
   )
