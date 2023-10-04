@@ -6,7 +6,7 @@ import SiteLogo from '../assets/images/logo192.png';
 /*Imports*/
 import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
-import am5geodata_worldHigh from "@amcharts/amcharts5-geodata/worldHigh";
+import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 import { ReactComponent as StationFinder } from '../assets/icons/station-finder.svg';
@@ -16,7 +16,7 @@ import { ReactComponent as StationAudioWaiting } from '../assets/icons/station-a
 import MainLoader from '../components/MainLoader';
 import Video from '../components/Video';
 
-import { countryBounds } from '../utils/country-bounding-data';
+import { country_codes, country_cords, random_country_cords } from '../utils/country-bounding-data';
 
 import { MdSkipNext, MdSkipPrevious } from 'react-icons/md';
 import { IoStop } from 'react-icons/io5';
@@ -36,54 +36,107 @@ const Home = () => {
     });
 
     useEffect(() => {
-
-    }, [])
-
-    useEffect(() => {
         axios({
-            // url: "https://de1.api.radio-browser.info/json/stations/search",
-            url: "http://de1.api.radio-browser.info/json/stations/bycountry/india",
+            url: "https://de1.api.radio-browser.info/json/stations",
             method: "POST",
             data: {
-                order: "name",
-                hidebroken: true
+                order: "votes",
+                hidebroken: true,
+                limit: 20000
             }
         })
             .then(async res => {
-                const formatted_stationlist = res.data.map(item => {
+                const data_urlfiltered = res.data.filter(itx => { return !itx.url.includes('m3u8') && !itx.url.includes('m3u') });
+                const filtered_data = data_urlfiltered.filter(itx => itx.country !== "" || itx.countrycode !== "UM");
+                // const my_data = filtered_data.map((itx, idx) => idx < 50);
+                const reduced_stationlist = filtered_data.map(item => {
                     return {
                         country: item.country,
                         countrycode: item.countrycode,
                         geo_lat: item.geo_lat,
                         geo_long: item.geo_long,
-                        homepage: item.homepage,
-                        language: item.language,
-                        languagecodes: item.languagecodes,
-                        name: item.name,
-                        serveruuid: item.serveruuid,
+                        // homepage: item.homepage,
+                        // language: item.language,
+                        // languagecodes: item.languagecodes,
+                        // name: item.name,
+                        // serveruuid: item.serveruuid,
                         stationuuid: item.stationuuid,
-                        url: item.url
+                        // url: item.url
                     }
                 });
-                const filtered_data = formatted_stationlist.filter(itx => !itx.url.includes('m3u8'));
+                console.log('station count', reduced_stationlist.length)
 
-                let coords;
-                await axios({
-                    url: 'http://localhost:5000/api/v1/' + "India",
-                    method: 'GET',
-                }).then(res => {
-                    console.log('res', res.data);
-                    coords = res.data
-                });
-
-                const final_data = await updateGeoCords(filtered_data, coords);
-                console.log("data", final_data)
-                setStations(final_data);
+                let data = [];
+                const formatted_data = filtered_data.reduce((acc, obj) => {
+                    const { country, ...rest } = obj;
+                    if (acc[country] !== undefined) {
+                        data = [...acc[country], rest]
+                    } else {
+                        data = [rest];
+                    }
+                    return { ...acc, [country]: data };
+                }, {});
+                optimizeData(formatted_data);
             })
             .catch(error => {
                 console.error("Error fetching station data:", error);
             });
     }, []);
+
+    const optimizeData = (data) => {
+        console.log("DATA:::", data);
+        console.log('COUNTRY count::', Object.keys(data).length);
+        let result = [];
+
+        // Object.keys(data).forEach((key, index) => {
+        //     const exact_country = countryCodes.find(itx => itx.code === data[key][0].countrycode)
+        //     if (exact_country === undefined) {
+        //         // console.log('key', key, data[key][0]);
+        //     } else {
+        //         result.push({
+        //             name: exact_country["name"],
+        //             count: data[key].length + 50
+        //         });
+        //     }
+        // });
+        // console.log("FINAL Data:::", result);
+
+        Object.keys(data).forEach((key, index) => {
+            const mapped_cords = country_cords.find(itx => itx.name === data[key][0].countrycode);
+            if (mapped_cords !== undefined) {
+                data[key].map((st, idx) => {
+                    st.geo_lat = mapped_cords["list"][idx][1];
+                    st.geo_long = mapped_cords["list"][idx][0];
+                    result.push(st);
+                });
+            }
+        })
+        console.log("test", result);
+        setStations(result);
+
+        // Object.keys(data).forEach(async (key, index) => {
+        //     const stationsCount = data[key].length;
+        //     const exact_country = countryCodes.find(itx => itx.code === data[key][0].countrycode)
+        //     if (exact_country !== undefined) {
+        //         promises.push(
+        //             await axios({
+        //                 url: `http://localhost:5000/api/v1/${exact_country.name}/${stationsCount}`,
+        //                 method: 'GET'
+        //             }).then(res => {
+        //                 const ree = data[key].map((itx, idx) => {
+        //                     itx.geo_lat = res.data[idx][1];
+        //                     itx.geo_long = res.data[idx][0];
+        //                     result.push(itx);
+        //                     return itx;
+        //                 })
+        //                 console.log("test", ree);
+        //             })
+        //         )
+        //     }
+        // });
+
+        // Promise.all(promises).then(() => { setStations(result); console.log("Result:::", result) });
+    }
 
     const updateGeoCords = async (stations, coords) => {
         var updatedData;
@@ -122,10 +175,14 @@ const Home = () => {
         }, 2000)
     }
 
-    var audio = document.createElement("audio");
-    audio.setAttribute("id", "station_audio");
-    audio.controls = true;
-    audio.volume = 1;
+    //Create audio player container
+    var audio_root = document.createElement("div");
+    audio_root.setAttribute("id", "station_audio_root");
+
+    // Manipulating with mouse code
+    var isDown = false;
+    var isMoving = false;
+    var bulletClicked = false;
 
     const start = (root) => {
         // Set themes
@@ -143,6 +200,7 @@ const Home = () => {
         root.events.on("frameended", () => exportChart(root));
         map.virtualization = true;
         map.chartContainer.get("background").events.on("click", () => map.goHome());
+        map.useWebWorkers = true;
 
         // Add zoom control
         var zoomControl = map.set("zoomControl", am5map.ZoomControl.new(root, {}));
@@ -173,7 +231,6 @@ const Home = () => {
             });
         });
 
-
         // Series for Background Fill
         let backgroundSeries = map.series.push(am5map.MapPolygonSeries.new(root, {}));
         backgroundSeries.mapPolygons.template.setAll({
@@ -186,7 +243,7 @@ const Home = () => {
 
         // Main polygon series for countries
         let polygonSeries = map.series.push(am5map.MapPolygonSeries.new(root, {
-            geoJSON: am5geodata_worldHigh
+            geoJSON: am5geodata_worldLow
         }));
         polygonSeries.mapPolygons.template.setAll({
             fill: am5.color("#059669"),
@@ -212,7 +269,7 @@ const Home = () => {
         }));
         pointSeries.bullets.push(function (event) {
             var circle = am5.Circle.new(root, {
-                radius: 3,
+                radius: 2,
                 fill: am5.color("#e11d48"),
                 tooltipText: "{name}",
                 strokeWidth: 0.25,
@@ -220,10 +277,12 @@ const Home = () => {
             });
             circle.interactionsEnabled = true;
             circle.events.on("click", function (ev) {
+                console.log('Bullet clicked');
+                bulletClicked = true;
                 const point_target = ev.target.dataItem.dataContext;
                 const latitude = point_target.geo_lat;
                 const longitude = point_target.geo_long;
-                console.log('tst', map)
+                console.log('tst', latitude, longitude)
                 map.zoomToGeoPoint({ latitude, longitude }, 10, true);
                 playStation(point_target);
                 // circle.fill = am5.color("#fff");
@@ -231,14 +290,13 @@ const Home = () => {
             return am5.Bullet.new(root, { sprite: circle });
         });
 
-        // Manipulating with mouse code
-        var isDown = false;
-        var isMoving = false;
+
         map.events.on("pointerdown", function () {
             isDown = true;
         })
         map.events.on("globalpointermove", function (e) {
             // if pointer is down
+            isMoving = false;
             if (isDown) {
                 // get tooltip data item
                 isMoving = true;
@@ -246,10 +304,10 @@ const Home = () => {
             }
         })
         map.events.on("globalpointerup", function (ev) {
-            console.log("TSTtt", isMoving);
-            if (isMoving) {
+            if (bulletClicked === false) {
                 isDown = false;
                 isMoving = false;
+                bulletClicked = false;
                 setFindingStation(isDown);
 
                 const val = document.getElementById("station-finder");
@@ -273,6 +331,7 @@ const Home = () => {
         });
 
         pointSeries.data.setAll(stations);
+
         // Make stuff animate on load
         map.appear(1000, 100);
     }
@@ -289,8 +348,26 @@ const Home = () => {
                 setPlayerWaiting(true);
                 const data = res.data[0];
 
+                //Remove existing audio and add new audio to container
+                if (audio_root.children.length > 0) {
+                    audio_root.removeChild(audio_root.firstElementChild);
+                }
+
+                //Initialize audio player with station url
+                var audio = document.createElement("audio");
                 audio.src = data.url;
-                audio.play();
+                audio.controls = true;
+                audio.volume = 1;
+
+                audio_root.appendChild(audio);
+                audio.play().then(res => {
+                    console.log("Audio res::", res);
+                }).catch(err => {
+                    console.log("Audio err::", err);
+                });
+
+                console.log("tst", audio_root)
+
                 setPlayingStation({ active: true, data });
 
                 audio.addEventListener('playing', () => {

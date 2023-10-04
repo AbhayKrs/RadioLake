@@ -71,10 +71,10 @@ const App = () => {
           path: '/',
           element: <Home />
         },
-        {
-          path: '/test',
-          element: <Test />,
-        },
+        // {
+        //   path: '/test',
+        //   element: <Test />,
+        // },
         // {
         //   path: '/dashboard',
         //   element: <Dashboard />

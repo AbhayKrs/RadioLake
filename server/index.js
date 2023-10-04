@@ -19,10 +19,13 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
-app.get(`/api/${currentVersion}/:id`, async (req, res) => {
+app.get(`/api/${currentVersion}/:country/:count`, async (req, res) => {
     try {
-        const data_to_pass_in = req.params.id;
-        const fetchCords_python = spawn('python', ['./server/link.py', data_to_pass_in]);
+        const country = req.params.country;
+        const count = req.params.count;
+        console.log("Tst", country, count);
+        const data_to_pass = { country, count };
+        const fetchCords_python = spawn('python', ['./server/link.py', JSON.stringify(data_to_pass)]);
         fetchCords_python.stdout.on('data', (data) => {
             res.send(JSON.parse(data));
         })
