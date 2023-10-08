@@ -19,6 +19,7 @@ const Home = () => {
         active: false,
         data: {}
     });
+    const [playerPause, setPlayerPause] = useState(false);
     const [playerWaiting, setPlayerWaiting] = useState(false);
     const [sidePanelUpdate, setSidePanelUpdate] = useState(false);
     const [panelListView, setPanelListView] = useState(false);
@@ -93,8 +94,8 @@ const Home = () => {
     return (
         <div className='relative'>
             {!dataReady && <MainLoader />}
-            {selectedCountry.length > 0 && <SidePanel audioRef={audioRef} stations={stations} playingStation={playingStation} setPlayingStation={setPlayingStation} playerWaiting={playerWaiting} viewedStations={viewedStations} setViewedStations={setViewedStations} selectedCountry={selectedCountry} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} panelListView={panelListView} />}
-            <MapChart audioRef={audioRef} stations={stations} dataReady={dataReady} playingStation={playingStation} setPlayingStation={setPlayingStation} selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} playerWaiting={playerWaiting} setPlayerWaiting={setPlayerWaiting} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} setPanelListView={setPanelListView} />
+            {selectedCountry.length > 0 && <SidePanel audioRef={audioRef} stations={stations} playingStation={playingStation} setPlayingStation={setPlayingStation} playerWaiting={playerWaiting} playerPause={playerPause} setPlayerPause={setPlayerPause} viewedStations={viewedStations} setViewedStations={setViewedStations} selectedCountry={selectedCountry} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} panelListView={panelListView} />}
+            <MapChart audioRef={audioRef} stations={stations} dataReady={dataReady} playingStation={playingStation} setPlayingStation={setPlayingStation} selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} playerWaiting={playerWaiting} setPlayerWaiting={setPlayerWaiting} playerPause={playerPause} setPlayerPause={setPlayerPause} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} setPanelListView={setPanelListView} />
         </div >
     )
 }

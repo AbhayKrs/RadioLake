@@ -8,11 +8,11 @@ import { country_codes } from '../utils/country-bounding-data';
 import { ReactComponent as StationAudioWaiting } from '../assets/icons/station-audio-waiting.svg';
 import { RiShareFill } from 'react-icons/ri';
 import { GoHeart, GoHeartFill } from 'react-icons/go';
-import { IoStop } from 'react-icons/io5';
+import { IoPlay, IoStop } from 'react-icons/io5';
 import { HiChevronUp, HiChevronDown } from 'react-icons/hi';
 
 const SidePanel = (props) => {
-    const { audioRef, stations, selectedCountry, playingStation, setPlayingStation, playerWaiting, viewedStations, setViewedStations, sidePanelUpdate, panelListView, setSidePanelUpdate } = props;
+    const { audioRef, stations, selectedCountry, playingStation, setPlayingStation, playerWaiting, playerPause, setPlayerPause, viewedStations, setViewedStations, sidePanelUpdate, panelListView, setSidePanelUpdate } = props;
     const [searchVal, setSearchVal] = useState('');
     const [volume, setVolume] = useState(50);
     const [liked, setLiked] = useState(false);
@@ -91,7 +91,11 @@ const SidePanel = (props) => {
                         {playerWaiting ?
                             <StationAudioWaiting fill="#000" stroke="#e11d48" className='w-8 h-8 text-neutral-800 cursor-pointer' />
                             :
-                            <IoStop className='w-7 h-7 text-neutral-800 cursor-pointer' />
+                            playerPause ?
+                                <IoPlay onClick={() => setPlayerPause(false)} className='w-7 h-7 text-neutral-800 cursor-pointer' />
+                                :
+                                <IoStop onClick={() => setPlayerPause(true)} className='w-7 h-7 text-neutral-800 cursor-pointer' />
+
                         }
                         {liked ?
                             <GoHeart className='w-7 h-7 text-gray-800 cursor-pointer' />

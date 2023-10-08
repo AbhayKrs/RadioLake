@@ -12,7 +12,7 @@ import { ReactComponent as StationFound } from '../assets/icons/station-found.sv
 
 const MapChart = (props) => {
     const mapRef = useRef(null);
-    const { audioRef, stations, dataReady, playingStation, setPlayingStation, selectedCountry, setSelectedCountry, playerWaiting, setPlayerWaiting, sidePanelUpdate, setSidePanelUpdate, setPanelListView } = props;
+    const { audioRef, stations, dataReady, playingStation, setPlayingStation, selectedCountry, setSelectedCountry, playerWaiting, setPlayerWaiting, playerPause, setPlayerPause, sidePanelUpdate, setSidePanelUpdate, setPanelListView } = props;
     const [findingStation, setFindingStation] = useState(false);
 
     useLayoutEffect(() => {
@@ -285,6 +285,19 @@ const MapChart = (props) => {
         }
     }, [playingStation, sidePanelUpdate]);
 
+    useEffect(() => {
+        if (playerPause) {
+            const audio_container = document.getElementById("audio_root");
+            audio_container.children[0].pause();
+            console.log("test", audio_container.children[0]);
+        } else {
+            const audio_container = document.getElementById("audio_root");
+            if (audio_container.children && audio_container.children[0]) {
+                audio_container.children[0].play();
+            }
+        }
+    }, [playerPause])
+
     const playStation = (station) => {
         console.log("station", station);
         axios.get('https://nl1.api.radio-browser.info/json/stations/byuuid/' + station.id)
@@ -292,15 +305,11 @@ const MapChart = (props) => {
                 setPlayerWaiting(true);
                 const data = res.data[0];
 
-                const audio_container = document.getElementById("audio_root");
-
                 //Remove existing audio and add new audio to container
-                console.log("before", document.getElementById("audio_root"));
+                const audio_container = document.getElementById("audio_root");
                 if (audio_container.children.length > 0) {
-                    console.log("removed")
                     audio_container.removeChild(audio_container.firstElementChild);
                 }
-                console.log("after", audio_container.children, audio_container.children.length)
 
                 //Initialize audio player with station url
                 var audio = document.createElement("audio");
@@ -309,7 +318,6 @@ const MapChart = (props) => {
                 audio.controls = true;
                 audio.volume = 1;
                 audio_container.appendChild(audio);
-                console.log("AUD::", audio);
 
                 audio.play().then(res => {
                     console.log("Audio res::", res);
