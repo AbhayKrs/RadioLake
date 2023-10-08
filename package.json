@@ -10,7 +10,7 @@
 		"client": "npm start --prefix client",
 		"dev": "concurrently \"npm run client\" \"npm run server\"",
 		"test": "echp \"Error: no test specified\" && exit 1",
-		"build": "cd client && npm run build",
+		"build": "cd web && npm run build",
 		"install-client": "cd web && npm install",
 		"build-client": "npm install && npm run install-client && npm run build"
 	},
