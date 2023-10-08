@@ -1,6 +1,5 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import axios from 'axios';
-
 
 import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
@@ -11,16 +10,10 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { ReactComponent as StationFinder } from '../assets/icons/station-finder.svg';
 import { ReactComponent as StationFound } from '../assets/icons/station-found.svg';
 
-
 const MapChart = (props) => {
-    const { stations, dataReady, playingStation, setPlayingStation, selectedCountry, setSelectedCountry, playerWaiting, setPlayerWaiting } = props;
+    const mapRef = useRef(null);
+    const { audioRef, stations, dataReady, playingStation, setPlayingStation, selectedCountry, setSelectedCountry, playerWaiting, setPlayerWaiting, sidePanelUpdate, setSidePanelUpdate, setPanelListView } = props;
     const [findingStation, setFindingStation] = useState(false);
-
-
-
-    //Create audio player container
-    var audio_root = document.createElement("div");
-    audio_root.setAttribute("id", "station_audio_root");
 
     useLayoutEffect(() => {
         if (dataReady) {
@@ -126,6 +119,7 @@ const MapChart = (props) => {
 
                 selected_countrycode = '';
                 pointSeries.bullets.clear();
+                setPanelListView(false);
             });
 
             //Point series to mark stations on map
@@ -136,15 +130,12 @@ const MapChart = (props) => {
 
             //Station close proximity play logic
             map.events.on("pointerdown", (ev) => {
-                console.log('startPanning');
                 startPanning = true;
                 isPanning = false;
                 country_bound_stations = [];
             })
             map.events.on("globalpointermove", (ev) => {
                 if (startPanning && selected_countrycode.length > 0) {
-                    console.log("Panning", startPanning, selected_countrycode);
-
                     findingStation === false && setFindingStation(true);
                     isPanning = true;
                     country_bound_stations = stations.filter(itx => itx.countrycode === selected_countrycode);
@@ -180,7 +171,6 @@ const MapChart = (props) => {
                             pointSeries.bulletsContainer.children.each((bullet) => { bullet.set("fill", am5.color("#e11d48")) });
 
                             var dataItem = pointSeries.getDataItemById(closest.id);
-
                             if (dataItem) {
                                 var sprite = dataItem.bullets[0].get("sprite");
                                 sprite.set("fill", am5.color("#fcd34d"));
@@ -266,46 +256,6 @@ const MapChart = (props) => {
                 pointSeries.id = "bullets"
             }
 
-            const playStation = (station) => {
-                axios.get('https://nl1.api.radio-browser.info/json/stations/byuuid/' + station.id)
-                    .then(res => {
-                        setPlayerWaiting(true);
-                        const data = res.data[0];
-
-                        //Remove existing audio and add new audio to container
-                        if (audio_root.children.length > 0) {
-                            audio_root.removeChild(audio_root.firstElementChild);
-                        }
-
-                        //Initialize audio player with station url
-                        var audio = document.createElement("audio");
-                        audio.src = data.url;
-                        audio.controls = true;
-                        audio.volume = 1;
-
-                        audio_root.appendChild(audio);
-                        audio.play().then(res => {
-                            console.log("Audio res::", res);
-                        }).catch(err => {
-                            console.log("Audio err::", err);
-                        });
-
-                        console.log("tst", audio_root)
-
-                        setPlayingStation({ active: true, data });
-
-                        audio.addEventListener('playing', () => {
-                            console.log('Station is playing');
-                            setPlayerWaiting(false);
-                        })
-                        audio.addEventListener('waiting', () => {
-                            console.log('Station is waiting');
-                        });
-                        console.log("Station Player Data:: ", res.data[0])
-                    })
-                    .catch(err => console.log(err))
-            }
-
             const findShortestDist = (pt1, pt2) => {
                 var diffX = Math.abs(pt1.latitude) - Math.abs(pt2.geo_lat);
                 var diffY = Math.abs(pt1.longitude) - Math.abs(pt2.geo_long);
@@ -315,10 +265,69 @@ const MapChart = (props) => {
 
             // Make stuff animate on load
             map.appear(1000, 100);
+            mapRef.current = map;
 
             return () => root.dispose();
         }
     }, [dataReady]);
+
+    useEffect(() => {
+        if (mapRef.current && sidePanelUpdate) {
+            setSidePanelUpdate(false);
+            mapRef.current.zoomToGeoPoint({ latitude: playingStation.data.geo_lat, longitude: playingStation.data.geo_long }, 8, true);
+            mapRef.current.series.getIndex(3).bulletsContainer.children.each((bullet) => { bullet.set("fill", am5.color("#e11d48")) });
+            var dataItem = mapRef.current.series.getIndex(3).getDataItemById(playingStation.data.id);
+            if (dataItem) {
+                var sprite = dataItem.bullets[0].get("sprite");
+                sprite.set("fill", am5.color("#fcd34d"));
+            }
+            playStation(playingStation.data);
+        }
+    }, [playingStation, sidePanelUpdate]);
+
+    const playStation = (station) => {
+        console.log("station", station);
+        axios.get('https://nl1.api.radio-browser.info/json/stations/byuuid/' + station.id)
+            .then(res => {
+                setPlayerWaiting(true);
+                const data = res.data[0];
+
+                const audio_container = document.getElementById("audio_root");
+
+                //Remove existing audio and add new audio to container
+                console.log("before", document.getElementById("audio_root"));
+                if (audio_container.children.length > 0) {
+                    console.log("removed")
+                    audio_container.removeChild(audio_container.firstElementChild);
+                }
+                console.log("after", audio_container.children, audio_container.children.length)
+
+                //Initialize audio player with station url
+                var audio = document.createElement("audio");
+                audioRef.current = audio;
+                audio.src = data.url;
+                audio.controls = true;
+                audio.volume = 1;
+                audio_container.appendChild(audio);
+                console.log("AUD::", audio);
+
+                audio.play().then(res => {
+                    console.log("Audio res::", res);
+                }).catch(err => {
+                    console.log("Audio err::", err);
+                });
+
+                setPlayingStation({ active: true, data });
+                audio.addEventListener('playing', () => {
+                    console.log('Station is playing');
+                    setPlayerWaiting(false);
+                })
+                audio.addEventListener('waiting', () => {
+                    console.log('Station is waiting');
+                });
+            })
+            .catch(err => console.log(err))
+    }
 
     return (
         <div>
@@ -331,6 +340,7 @@ const MapChart = (props) => {
                     <StationFound id="station-finder" stroke="#fafafa" className="absolute z-20 inset-0 m-auto pointer-events-none select-none" />
                 }
             </>}
+            <div id="audio_root" className="hidden" />
         </div >
     )
 }

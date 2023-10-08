@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
+
+import { country_cords } from '../utils/country-bounding-data';
 
 import MainLoader from '../components/MainLoader';
 import MapChart from "../components/MapChart";
-import { country_cords } from '../utils/country-bounding-data';
 import SidePanel from '../components/SidePanel';
 
 const Home = () => {
+    const audioRef = useRef();
 
     const [stations, setStations] = useState([]);
     const [viewedStations, setViewedStations] = useState();
@@ -18,6 +20,8 @@ const Home = () => {
         data: {}
     });
     const [playerWaiting, setPlayerWaiting] = useState(false);
+    const [sidePanelUpdate, setSidePanelUpdate] = useState(false);
+    const [panelListView, setPanelListView] = useState(false);
 
     useEffect(() => {
         fetchStations();
@@ -27,6 +31,7 @@ const Home = () => {
         if (selectedCountry.length > 0) {
             const filteredList = stations.filter(item => item.countrycode === selectedCountry);
             setViewedStations(filteredList);
+            setPanelListView(true);
         }
     }, [selectedCountry])
 
@@ -77,7 +82,6 @@ const Home = () => {
                         });
                     }
                 })
-                console.log("test", result);
                 setStations(result);
                 setDataReady(true);
             })
@@ -89,8 +93,8 @@ const Home = () => {
     return (
         <div className='relative'>
             {!dataReady && <MainLoader />}
-            {playingStation.active && <SidePanel playingStation={playingStation} playerWaiting={playerWaiting} viewedStations={viewedStations} />}
-            <MapChart stations={stations} dataReady={dataReady} playingStation={playingStation} setPlayingStation={setPlayingStation} selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} playerWaiting={playerWaiting} setPlayerWaiting={setPlayerWaiting} />
+            {selectedCountry.length > 0 && <SidePanel audioRef={audioRef} stations={stations} playingStation={playingStation} setPlayingStation={setPlayingStation} playerWaiting={playerWaiting} viewedStations={viewedStations} setViewedStations={setViewedStations} selectedCountry={selectedCountry} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} panelListView={panelListView} />}
+            <MapChart audioRef={audioRef} stations={stations} dataReady={dataReady} playingStation={playingStation} setPlayingStation={setPlayingStation} selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} playerWaiting={playerWaiting} setPlayerWaiting={setPlayerWaiting} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} setPanelListView={setPanelListView} />
         </div >
     )
 }
