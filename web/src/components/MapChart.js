@@ -65,6 +65,25 @@ const MapChart = (props) => {
                 handleSelectCountry(target.dataItem.get("id"));
             });
 
+            // Add zoom control
+            var zoomControl = map.set("zoomControl", am5map.ZoomControl.new(root, {}));
+            zoomControl.children.each((button) => {
+                button.get("icon").setAll({
+                    fill: am5.color('#000'),
+                    stroke: am5.color('#000')
+                });
+                button.get("background").setAll({
+                    fill: am5.color('#fcd34d'),
+                    stroke: 0
+                });
+                button.get("background").states.create("hover", {}).setAll({
+                    fill: am5.color('#fff')
+                });
+                button.get("background").states.create("down", {}).setAll({
+                    fill: am5.color('#fff')
+                });
+            });
+
             // Series for Country specific polygon
             let countrySeries = map.series.push(am5map.MapPolygonSeries.new(root, {
                 visible: false
@@ -118,6 +137,7 @@ const MapChart = (props) => {
                 backContainer.hide(100);
 
                 selected_countrycode = '';
+                setSelectedCountry('');
                 pointSeries.bullets.clear();
                 setPanelListView(false);
             });
@@ -289,7 +309,6 @@ const MapChart = (props) => {
         if (playerPause) {
             const audio_container = document.getElementById("audio_root");
             audio_container.children[0].pause();
-            console.log("test", audio_container.children[0]);
         } else {
             const audio_container = document.getElementById("audio_root");
             if (audio_container.children && audio_container.children[0]) {

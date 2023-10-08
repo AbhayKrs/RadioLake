@@ -16,7 +16,7 @@ const SidePanel = (props) => {
     const [searchVal, setSearchVal] = useState('');
     const [volume, setVolume] = useState(50);
     const [liked, setLiked] = useState(false);
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const [currentTime, setCurrentTime] = useState(moment().format('LTS'));
 
     useEffect(() => {
@@ -62,7 +62,10 @@ const SidePanel = (props) => {
                         {isOpen ? <HiChevronDown className='h-8 w-8 text-neutral-800' /> : <HiChevronUp className='h-8 w-8 text-neutral-800' />}
                     </div>
                     <div className='flex flex-row justify-between items-end w-full'>
-                        <p className="font-caviar text-2xl font-bold text-neutral-800">{country_codes.find(itx => itx.code === selectedCountry).name}</p>
+                        <div className='flex flex-col'>
+                            <p className="font-caviar text-2xl font-bold text-neutral-800">{country_codes.find(itx => itx.code === selectedCountry).name}</p>
+                            <p className="font-caviar text-sm font-bold text-neutral-800">{viewedStations.length} Stations</p>
+                        </div>
                         <p className='font-caviar text-xs font-bold text-neutral-800'>{currentTime}</p>
                     </div>
                     <SearchBar searchVal={searchVal} setSearchVal={setSearchVal} />

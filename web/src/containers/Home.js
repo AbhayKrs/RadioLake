@@ -32,7 +32,9 @@ const Home = () => {
         if (selectedCountry.length > 0) {
             const filteredList = stations.filter(item => item.countrycode === selectedCountry);
             setViewedStations(filteredList);
-            setPanelListView(true);
+            setTimeout(() => {
+                setPanelListView(true);
+            }, 2000)
         }
     }, [selectedCountry])
 
