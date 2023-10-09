@@ -51,7 +51,7 @@ const Home = () => {
             .then(async res => {
                 console.log("fetchStations", res);
                 const data_urlfiltered = res.data.filter(itx => { return !itx.url.includes('m3u8') && !itx.url.includes('m3u') });
-                const filtered_data = data_urlfiltered.filter(itx => itx.country !== "" || itx.countrycode !== "UM");
+                const filtered_data = data_urlfiltered.filter(itx => itx.country !== "" || itx.countrycode !== "" || itx.countrycode !== "UM");
                 const reduced_stationlist = filtered_data.map(item => {
                     return {
                         id: item.stationuuid,
