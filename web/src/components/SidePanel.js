@@ -73,7 +73,7 @@ const SidePanel = (props) => {
                 {isOpen && (
                     <>
                         <hr className='border-2 w-10/12 mx-4 rounded-md border-neutral-800' />
-                        <ul style={{ maxHeight: "calc(100vh - 250px)" }} className='scrollbar flex flex-col w-full h-full mt-2 px-2 overflow-y-auto divide-y divide-neutral-800'>
+                        <ul style={{ maxHeight: "calc(100vh - 350px)" }} className='scrollbar flex flex-col w-full h-full mt-2 px-2 overflow-y-auto divide-y divide-neutral-800'>
                             {viewedStations.map(itx => (
                                 <li key={itx.id} onClick={() => handleStationChange(itx)} className=''>
                                     <p className={`font-caviar font-bold text-sm w-full p-1.5 ${playingStation.data.stationuuid === itx.id ? 'bg-rose-600' : 'hover:bg-yellow-500/75'} cursor-pointer`}>{itx.name}</p>

@@ -7,8 +7,12 @@ import MainLoader from '../components/MainLoader';
 import MapChart from "../components/MapChart";
 import SidePanel from '../components/SidePanel';
 
+import { BsInfoCircle } from "react-icons/bs";
+
 const Home = () => {
     const audioRef = useRef();
+    const [msg1_active, setMsg1Active] = useState(true);
+    const [msg2_active, setMsg2Active] = useState(false);
 
     const [stations, setStations] = useState([]);
     const [viewedStations, setViewedStations] = useState();
@@ -30,11 +34,16 @@ const Home = () => {
 
     useEffect(() => {
         if (selectedCountry.length > 0) {
+            setMsg1Active(false);
             const filteredList = stations.filter(item => item.countrycode === selectedCountry);
             setViewedStations(filteredList);
             setTimeout(() => {
+                setMsg2Active(true);
                 setPanelListView(true);
             }, 2000)
+        } else {
+            setMsg1Active(true);
+            setMsg2Active(false);
         }
     }, [selectedCountry])
 
@@ -100,6 +109,14 @@ const Home = () => {
 
     return (
         <div className='relative'>
+            {msg1_active && <div className='absolute top-3 left-0 z-20 flex flex-row gap-2 items-center'>\
+                <BsInfoCircle className="h-5 w-5 text-gray-200" />
+                <p className='font-caviar text-lg text-gray-200'>Click on a country to view the stations and start playing.</p>
+            </div>}
+            {msg2_active && <div className='absolute top-3 left-0 z-20 flex flex-row gap-2 items-center'>\
+                <BsInfoCircle className="h-5 w-5 text-gray-200" />
+                <p className='font-caviar text-lg text-gray-200'>Drag towards a station or use the panel to browse through stations.</p>
+            </div>}
             {!dataReady && <MainLoader />}
             {selectedCountry.length > 0 && <SidePanel audioRef={audioRef} stations={stations} playingStation={playingStation} setPlayingStation={setPlayingStation} playerWaiting={playerWaiting} playerPause={playerPause} setPlayerPause={setPlayerPause} viewedStations={viewedStations} setViewedStations={setViewedStations} selectedCountry={selectedCountry} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} panelListView={panelListView} />}
             <MapChart audioRef={audioRef} stations={stations} dataReady={dataReady} playingStation={playingStation} setPlayingStation={setPlayingStation} selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} playerWaiting={playerWaiting} setPlayerWaiting={setPlayerWaiting} playerPause={playerPause} setPlayerPause={setPlayerPause} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} setPanelListView={setPanelListView} />
