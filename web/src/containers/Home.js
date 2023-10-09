@@ -49,6 +49,7 @@ const Home = () => {
             }
         })
             .then(async res => {
+                console.log("fetchStations", res);
                 const data_urlfiltered = res.data.filter(itx => { return !itx.url.includes('m3u8') && !itx.url.includes('m3u') });
                 const filtered_data = data_urlfiltered.filter(itx => itx.country !== "" || itx.countrycode !== "UM");
                 const reduced_stationlist = filtered_data.map(item => {
@@ -72,10 +73,10 @@ const Home = () => {
                     }
                     return { ...acc, [country]: data };
                 }, {});
+                console.log("formatted", formatted_data);
 
                 let result = [];
-
-                Object.keys(formatted_data).forEach((key, index) => {
+                Object.keys(formatted_data).forEach((key) => {
                     const mapped_cords = country_cords.find(itx => itx.name === formatted_data[key][0].countrycode);
                     if (mapped_cords !== undefined) {
                         formatted_data[key].map((st, idx) => {
@@ -85,6 +86,8 @@ const Home = () => {
                         });
                     }
                 })
+                console.log("result", result);
+
                 setStations(result);
                 setDataReady(true);
             })
