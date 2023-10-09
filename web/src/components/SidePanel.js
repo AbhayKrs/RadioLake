@@ -30,18 +30,10 @@ const SidePanel = (props) => {
     }, []);
 
     useEffect(() => {
-        if (audioRef.current) {
-            audioRef.current.volume = volume / 100;
+        if (selectedCountry.length > 0) {
+            setIsOpen(false);
         }
-    }, [volume])
-
-    const handleStationChange = (station) => {
-        setPlayingStation({
-            active: true,
-            data: station
-        });
-        setSidePanelUpdate(true);
-    }
+    }, [selectedCountry])
 
     useEffect(() => {
         if (searchVal.length > 0) {
@@ -54,9 +46,24 @@ const SidePanel = (props) => {
         }
     }, [searchVal])
 
+
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.volume = volume / 100;
+        }
+    }, [volume, playingStation])
+
+    const handleStationChange = (station) => {
+        setPlayingStation({
+            active: true,
+            data: station
+        });
+        setSidePanelUpdate(true);
+    }
+
     return (
         <div className="absolute z-30 bottom-1 left-1 z-40 max-w-xs w-full flex flex-col gap-2">
-            {panelListView && <div className="flex flex-col items-center bg-amber-300 rounded-md">
+            {selectedCountry.length > 0 && <div className="flex flex-col items-center bg-amber-300 rounded-md">
                 <div className={`flex flex-col items-center mb-2 px-2 w-full transition-colors duration-200 ${isOpen ? 'rounded-t-md' : 'rounded-md'}`}>
                     <div className='cursor-pointer' onClick={() => setIsOpen(!isOpen)}>
                         {isOpen ? <HiChevronDown className='h-8 w-8 text-neutral-800' /> : <HiChevronUp className='h-8 w-8 text-neutral-800' />}

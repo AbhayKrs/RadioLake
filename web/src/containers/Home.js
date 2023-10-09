@@ -109,6 +109,7 @@ const Home = () => {
 
     return (
         <div className='relative'>
+            {!dataReady && <MainLoader />}
             {msg1_active && <div className='absolute top-3 left-0 z-20 flex flex-row gap-2 items-center'>\
                 <BsInfoCircle className="h-5 w-5 text-gray-200" />
                 <p className='font-caviar text-lg text-gray-200'>Click on a country to view the stations and start playing.</p>
@@ -117,8 +118,7 @@ const Home = () => {
                 <BsInfoCircle className="h-5 w-5 text-gray-200" />
                 <p className='font-caviar text-lg text-gray-200'>Drag towards a station or use the panel to browse through stations.</p>
             </div>}
-            {!dataReady && <MainLoader />}
-            {selectedCountry.length > 0 && <SidePanel audioRef={audioRef} stations={stations} playingStation={playingStation} setPlayingStation={setPlayingStation} playerWaiting={playerWaiting} playerPause={playerPause} setPlayerPause={setPlayerPause} viewedStations={viewedStations} setViewedStations={setViewedStations} selectedCountry={selectedCountry} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} panelListView={panelListView} />}
+            {panelListView && <SidePanel audioRef={audioRef} stations={stations} playingStation={playingStation} setPlayingStation={setPlayingStation} playerWaiting={playerWaiting} playerPause={playerPause} setPlayerPause={setPlayerPause} viewedStations={viewedStations} setViewedStations={setViewedStations} selectedCountry={selectedCountry} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} panelListView={panelListView} />}
             <MapChart audioRef={audioRef} stations={stations} dataReady={dataReady} playingStation={playingStation} setPlayingStation={setPlayingStation} selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} playerWaiting={playerWaiting} setPlayerWaiting={setPlayerWaiting} playerPause={playerPause} setPlayerPause={setPlayerPause} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} setPanelListView={setPanelListView} />
         </div >
     )
