@@ -9,6 +9,8 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 import { ReactComponent as StationFinder } from '../assets/icons/station-finder.svg';
 import { ReactComponent as StationFound } from '../assets/icons/station-found.svg';
+import { MdAdd } from 'react-icons/md';
+import { HiOutlineMinus } from 'react-icons/hi';
 
 const MapChart = (props) => {
     const mapRef = useRef(null);
@@ -63,25 +65,6 @@ const MapChart = (props) => {
             });
             polygonSeries.mapPolygons.template.on("active", (active, target) => {
                 handleSelectCountry(target.dataItem.get("id"));
-            });
-
-            // Add zoom control
-            var zoomControl = map.set("zoomControl", am5map.ZoomControl.new(root, {}));
-            zoomControl.children.each((button) => {
-                button.get("icon").setAll({
-                    fill: am5.color('#000'),
-                    stroke: am5.color('#000')
-                });
-                button.get("background").setAll({
-                    fill: am5.color('#fcd34d'),
-                    stroke: 0
-                });
-                button.get("background").states.create("hover", {}).setAll({
-                    fill: am5.color('#fff')
-                });
-                button.get("background").states.create("down", {}).setAll({
-                    fill: am5.color('#fff')
-                });
             });
 
             // Series for Country specific polygon
@@ -207,7 +190,6 @@ const MapChart = (props) => {
             // ########################################
             // ############## FUNCTIONS ###############
             // ########################################
-
             const handleSelectCountry = (id) => {
                 var dataItem = polygonSeries.getDataItemById(id);
                 var target = dataItem.get("mapPolygon");
@@ -367,6 +349,10 @@ const MapChart = (props) => {
                     <StationFound id="station-finder" stroke="#fafafa" className="absolute z-20 inset-0 m-auto pointer-events-none select-none" />
                 }
             </>}
+            <div className="flex flex-col absolute z-20 right-2 bottom-2 bg-neutral-700 rounded-md">
+                <button onClick={() => mapRef.current.zoomIn()} className="p-2 text-gray-200 hover:bg-amber-300 hover:text-gray-800 rounded-t-md"><MdAdd className="h-6 w-6" /></button>
+                <button onClick={() => mapRef.current.zoomOut()} className="p-2 text-gray-200 hover:bg-amber-300 hover:text-gray-800 rounded-b-md"><HiOutlineMinus className="h-6 w-6" /></button>
+            </div>
             <div id="audio_root" className="hidden" />
         </div >
     )

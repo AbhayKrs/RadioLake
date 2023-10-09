@@ -45,13 +45,12 @@ const Home = () => {
             data: {
                 order: "votes",
                 hidebroken: true,
-                // limit: 500
+                reverse: true
             }
         })
             .then(async res => {
-                console.log("fetchStations", res);
                 const data_urlfiltered = res.data.filter(itx => { return !itx.url.includes('m3u8') && !itx.url.includes('m3u') });
-                const filtered_data = data_urlfiltered.filter(itx => itx.country !== "" || itx.countrycode !== "" || itx.countrycode !== "UM");
+                const filtered_data = data_urlfiltered.filter(itx => { return itx.countrycode.length > 0 && itx.countrycode !== "UM" });
                 const reduced_stationlist = filtered_data.map(item => {
                     return {
                         id: item.stationuuid,
@@ -59,20 +58,23 @@ const Home = () => {
                         country: item.country,
                         countrycode: item.countrycode,
                         geo_lat: item.geo_lat,
-                        geo_long: item.geo_long,
+                        geo_long: item.geo_long
                     }
                 });
 
-                let data = [];
+                let reduced_data = [];
                 const formatted_data = reduced_stationlist.reduce((acc, obj) => {
                     const { country, ...rest } = obj;
                     if (acc[country] !== undefined) {
-                        data = [...acc[country], rest]
+                        reduced_data = [...acc[country], rest]
                     } else {
-                        data = [rest];
+                        reduced_data = [rest];
                     }
-                    return { ...acc, [country]: data };
+                    return { ...acc, [country]: reduced_data };
                 }, {});
+                Object.keys(formatted_data).forEach(key => {
+                    formatted_data[key] = formatted_data[key].slice(0, 500);
+                })
                 console.log("formatted", formatted_data);
 
                 let result = [];
