@@ -110,13 +110,13 @@ const Home = () => {
     return (
         <div className='relative'>
             {!dataReady && <MainLoader />}
-            {msg1_active && <div className='absolute top-3 left-0 z-20 flex flex-row gap-2 items-center'>\
-                <BsInfoCircle className="h-5 w-5 text-gray-200" />
-                <p className='font-caviar text-lg text-gray-200'>Click on a country to view the stations and start playing.</p>
+            {msg1_active && <div className='absolute top-3 left-2 z-20 flex flex-row gap-1.5 items-center'>
+                <BsInfoCircle className="h-4 w-4 text-gray-200" />
+                <p className='font-caviar text-gray-200'>Click on a country to view the stations and start playing.</p>
             </div>}
-            {msg2_active && <div className='absolute top-3 left-0 z-20 flex flex-row gap-2 items-center'>
-                <BsInfoCircle className="h-5 w-5 text-gray-200" />
-                <p className='font-caviar text-lg text-gray-200'>Drag towards a station or use the panel to browse through stations.</p>
+            {msg2_active && <div className='absolute top-3 left-2 z-20 flex flex-row gap-1.5 items-center'>
+                <BsInfoCircle className="h-4 w-4 text-gray-200" />
+                <p className='font-caviar text-gray-200'>Drag towards a station or use the panel to browse through stations.</p>
             </div>}
             {panelListView && <SidePanel audioRef={audioRef} stations={stations} playingStation={playingStation} setPlayingStation={setPlayingStation} playerWaiting={playerWaiting} playerPause={playerPause} setPlayerPause={setPlayerPause} viewedStations={viewedStations} setViewedStations={setViewedStations} selectedCountry={selectedCountry} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} panelListView={panelListView} />}
             <MapChart audioRef={audioRef} stations={stations} dataReady={dataReady} playingStation={playingStation} setPlayingStation={setPlayingStation} selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} playerWaiting={playerWaiting} setPlayerWaiting={setPlayerWaiting} playerPause={playerPause} setPlayerPause={setPlayerPause} sidePanelUpdate={sidePanelUpdate} setSidePanelUpdate={setSidePanelUpdate} setPanelListView={setPanelListView} />

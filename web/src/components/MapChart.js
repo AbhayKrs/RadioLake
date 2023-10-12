@@ -103,8 +103,7 @@ const MapChart = (props) => {
                     startPanning = false;
                     isPanning = false;
                     setFindingStation(false);
-
-                    if (selected_countrycode.length > 0 && country_bound_stations.length > 0) {
+                    if (selected_countrycode.length > 0 && country_bound_stations.length > 0 && pointSeries.bulletsContainer.children.length > 0) {
                         const val = document.getElementById("station-finder");
                         const finder_bounds = val.getBoundingClientRect();
 
@@ -305,7 +304,6 @@ const MapChart = (props) => {
 
             selected_countrycode = '';
             setSelectedCountry('');
-            console.log("tst", mapRef.current.series.getIndex(3));
             mapRef.current.series.getIndex(3).bulletsContainer.children.clear();
             mapRef.current.series.getIndex(3).bullets.clear();
         }
@@ -322,7 +320,7 @@ const MapChart = (props) => {
                 }
             </>}
             <div className="flex flex-col items-center absolute z-20 right-2 bottom-2 rounded-md">
-                {selectedCountry.length > 0 && <MapHome onClick={() => mapToHome()} className="h-10 w-10 mb-2 cursor-pointer" />}
+                {selectedCountry.length > 0 && <MapHome id="map_home" onClick={() => mapToHome()} className="h-10 w-10 mb-2 cursor-pointer" />}
                 <button onClick={() => mapRef.current.zoomIn()} className="p-2 bg-neutral-700 text-gray-200 hover:bg-amber-300 hover:text-gray-800 rounded-t-md"><MdAdd className="h-6 w-6" /></button>
                 <button onClick={() => mapRef.current.zoomOut()} className="p-2 bg-neutral-700 text-gray-200 hover:bg-amber-300 hover:text-gray-800 rounded-b-md"><HiOutlineMinus className="h-6 w-6" /></button>
             </div>
